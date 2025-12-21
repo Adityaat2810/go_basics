@@ -1,0 +1,9 @@
+# Reason to choose golang
+    - build time
+    - fast startup
+    - performance and efficiency( less memory usgage )
+    - concurrency model( help in efficient utilization of cpu )
+    - static typing( we define types of variable) and compilation
+    - executable size is less
+
+
