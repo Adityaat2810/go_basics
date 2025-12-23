@@ -7,3 +7,13 @@
     - executable size is less
 
 
+
+GO BACKEND STEPS
+-------------------------------------------------------
+- Effective go (article)
+- Pracrice
+- Simple to complex http services web backends
+- CLI tools
+- gRPC
+- Just pipelines jobs/scripts
+- Testing (https://quii.gitbook.io/learn-go-with-tests/)
