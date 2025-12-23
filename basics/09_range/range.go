@@ -36,8 +36,11 @@ func main(){
   /**************** iterating strings *****************************/
   for sbr , character := range "aditya" {
 	// [ IMP!! ]charcter will hold the unicode { code point rune }
-	// sbr hold the starting point of rune  
+	// sbr hold the starting point of rune
 	fmt.Println("sbr is starting point of rune  ", sbr, "char is ", character)
+
+	// to actually get the char
+	fmt.Println("char here is ", string(character))
   }
 
 
