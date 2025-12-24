@@ -11,7 +11,7 @@
 GO BACKEND STEPS
 -------------------------------------------------------
 - Effective go (article)
-- Pracrice
+- Practice
 - Simple to complex http services web backends
 - CLI tools
 - gRPC
