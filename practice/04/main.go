@@ -44,6 +44,18 @@ func updateNameById(users * map[int] User, id int, newName string){
   fmt.Println("name updated to ", (*users)[id].Name)
 }
 
+// Q7 { Return a slice of adult users. }
+func findAdultUsers(users []User) []User{
+	var adultUsers []User
+	for _, user := range users{
+		if user.Age >= 18 {
+			adultUsers = append(adultUsers, user)
+		}
+	}
+
+	return  adultUsers
+}
+
 func main(){
   var users = make(map[int]User)
 
@@ -57,8 +69,5 @@ func main(){
   for id, user := range users{
 	fmt.Println("ID:", id, " Name:", user.Name)
   }
-
-
-
 
 }
