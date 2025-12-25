@@ -1,4 +1,7 @@
 package main
+
+import "fmt"
+
 /*
 * In Go, methods are functions attached to a type.
 
@@ -26,9 +29,32 @@ to modify the struct.
 “Methods operate on structs.
 Receivers decide whether the method sees a copy or the real thing.”
 
-
 */
 
-func main(){
+type Account struct{
+  Name string
+  Balance int
+}
 
+// if use value reciever here it modify copy of it and orignally remained unchanged
+func (acc *Account) Deposite(sum int){
+  acc.Balance = acc.Balance + sum
+}
+
+// use value reciever here { we are doing read operation only }
+func (acc Account) GetBalance() int {
+	return acc.Balance
+}
+
+// [IMP!!] If method modifies the struct → use pointer receiver
+
+func main(){
+  acc := Account{
+	Name: "aditya",
+	Balance: 10000,
+  }
+
+  acc.Deposite(100)
+
+  fmt.Println(acc.GetBalance())
 }
