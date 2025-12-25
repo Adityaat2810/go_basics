@@ -39,7 +39,7 @@ c) Why struct should use pointer receiver
 type Account struct{
   Name string
   Balance int
-}
+} 
 
 func createAccount(users map[int] *Account, name string) *Account{
   key := len(users) + 1
