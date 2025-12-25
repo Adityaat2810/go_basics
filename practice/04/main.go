@@ -25,23 +25,22 @@ func updateUserAge(users *map[int]User, newAge int, id int){
    (*users)[id] = u
 }
 
-func createUser(users *map[int]User, name string , age int , email string){
-  (*users)[len(*users)+1] = User{
-	Name: name,
+func createUser(users map[int] *User, name string , age int , email string){
+  id := len(users)+1
+  users[id] = &User{
+    Name: name,
 	Age: age,
 	Email: email,
   }
 }
 
-func updateNameById(users * map[int] User, id int, newName string){
-  u, ok := (*users)[id]
-  if !ok {
-    fmt.Println("no user with id", id)
-    return
-  }
-  u.Name = newName
-  (*users)[id] = u
-  fmt.Println("name updated to ", (*users)[id].Name)
+func updateNameById(users map[int]*User, id int, newName string) {
+	user, ok := users[id]
+	if !ok {
+		fmt.Println("no user with id", id)
+		return
+	}
+	user.Name = newName
 }
 
 // Q7 { Return a slice of adult users. }
@@ -56,18 +55,32 @@ func findAdultUsers(users []User) []User{
 	return  adultUsers
 }
 
+// Q8 Increase age of all users by 1.
+func incrementAge(users []*User) {
+	for _, user := range users {
+		user.Age++
+	}
+}
+
+
 func main(){
-  var users = make(map[int]User)
+  var users = make(map[int]*User)
 
-  createUser(&users, "aditya", 22, "adi@example.com")
-  createUser(&users, "ravi", 35, "ravi@example.com")
-  createUser(&users, "cp", 33, "cp@example.com")
-  createUser(&users, "devansh", 21, "dev@example.com")
+  createUser(users, "aditya", 22, "adi@example.com")
+  createUser(users, "ravi", 35, "ravi@example.com")
+  createUser(users, "cp", 33, "cp@example.com")
+  createUser(users, "devansh", 21, "dev@example.com")
 
-  updateNameById(&users, 2, "ravindra")
+  updateNameById(users, 2, "ravindra")
 
   for id, user := range users{
 	fmt.Println("ID:", id, " Name:", user.Name)
+  }
+
+// convert map to slice of pointers
+  var userSlice []*User
+  for _, user := range users {
+  	userSlice = append(userSlice, user)
   }
 
 }
