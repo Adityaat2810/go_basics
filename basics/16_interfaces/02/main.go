@@ -16,8 +16,16 @@ Concrete implementation: Stripe payment gateway
 type stripe struct{}
 
 // stripe implements the `paymenter` interface
-func (s stripe) pay(amount float32) {
+func (s stripe) pay (amount float32) {
 	fmt.Println("Making payment using Stripe:", amount)
+}
+
+
+//******* fake payment gateway
+type fakePayment struct{}
+
+func (f fakePayment) pay(amount float32) {
+	fmt.Println("Making payment using fake gateway:", amount)
 }
 
 /*
@@ -33,7 +41,7 @@ payment struct depends on an INTERFACE, not a concrete type
 This enables dependency injection and loose coupling
 */
 type payment struct {
-	gateway paymenter
+	gateway paymenter // mens we can pass any struct here that satisfy or implement interface paymenter
 }
 
 // Method that uses the interface
@@ -43,11 +51,12 @@ func (p payment) makePayment(amount float32) {
 
 func main() {
 	// concrete implementation
-	stripePaymentGateway := stripe{}
+	// stripePaymentGateway := stripe{}
+	fakePaymentGateway := fakePayment{}
 
 	// inject dependency
 	newPayment := payment{
-		gateway: stripePaymentGateway,
+		gateway: fakePaymentGateway,
 	}
 
 	// make payment
