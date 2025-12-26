@@ -23,6 +23,13 @@ func (s stripe) pay(amount float32){
 	fmt.Println("making payment using stripe", amount)
 }
 
+// for testing
+type fakePayment struct{}
+
+func (f fakePayment) pay(amount float32){
+  fmt.Println("making payement using fake gateway for testing", amount)
+}
+
 // payment
 
 /*******************
@@ -43,7 +50,7 @@ func (p Payment) makePayment(amount float32){
 // bit improved
 type Payment struct{
   gateway stripe                   // problem is still not solved
-                                   // changeing gatway still require modification of struct 
+                                   // changeing gatway still require modification of struct
 }
 
 func (p Payment) makePayment(amount float32){
@@ -54,8 +61,10 @@ func (p Payment) makePayment(amount float32){
 
 func main(){
   stripePaymentGateway := stripe{}
+  // fakePaymentGateway := fakePayment{}
   newPayment := Payment{
     gateway: stripePaymentGateway,
+    // gateway: fakePaymentGateway // cannot pass fake payment gateway here as in struct payment - payemnt method is literally hardcoded 
   }
   newPayment.makePayment(100)
 }
