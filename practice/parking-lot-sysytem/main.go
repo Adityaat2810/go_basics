@@ -1,24 +1,120 @@
 package main
 
-import (
-	"errors"
-	"fmt"
-)
+import "fmt"
 
-//
-// ===== ENUMS =====
-//
+// parking lot
 
-type VehicleType int
+type ParkingLot struct{
+  Id int
+  Slots []ParkingSlot
+}
+
+type ParkingLoter interface{
+	park(vehicle Vehicle)
+	unPark(vehicle Vehicle)
+}
+
+func helpParking(lot *ParkingLot, minSize slotSize, v Vehicle){
+  idxBest := -1
+  diff := slotSize(1<<10)
+  for idx, slot := range lot.Slots{
+	currDiff := slot.Size-minSize
+	if !slot.IsOccupied && currDiff >= 0 {
+        if currDiff < diff {
+			diff = currDiff
+            idxBest = idx
+		}
+
+	}
+  }
+
+  if idxBest == -1{
+	fmt.Println("Cannot park lot is full")
+  }else{
+	lot.Slots[idxBest].IsOccupied = true
+	lot.Slots[idxBest].Vehicle = v
+	fmt.Println("vehicle ", GetVehicleType(v.vehicleType), " is Parked to ", GetSlotType(lot.Slots[idxBest].Size)," slot")
+  }
+}
+
+func (lot *ParkingLot) park(v Vehicle){
+	switch v.vehicleType{
+	  case Bike:{
+		// can be parked to small, medium and large( priority to large)
+		helpParking(lot, Small, v)
+	  }
+	  case Car:{
+		// can be parked to medium & large( priority to medium )
+		helpParking(lot, Medium, v)
+
+	  }
+
+	  case Truck:{
+		// can be parked to large
+		helpParking(lot, Large, v)
+	  }
+
+	}
+
+}
+
+func (lot *ParkingLot) unPark(v Vehicle) {
+	for i := range lot.Slots {
+		slot := &lot.Slots[i]
+		if slot.IsOccupied && slot.Vehicle.Id == v.Id {
+			slot.IsOccupied = false
+			slot.Vehicle = Vehicle{}
+			return
+		}
+	}
+}
+
+
+// parking slot
+type ParkingSlot struct{
+  Id int
+  Size slotSize
+  IsOccupied bool
+  Vehicle Vehicle
+
+}
+
+type slotSize int
 
 const (
-	Bike VehicleType = iota
-	Car
-	Truck
+	Small slotSize = iota
+	Medium
+	Large
 )
 
-func (v VehicleType) String() string {
-	switch v {
+func GetSlotType(s slotSize) string{
+	switch s{
+	case Small:
+		return "Small"
+	case Medium:
+		return "Medium"
+	case Large:
+		return "Large"
+	default:
+		return "Unknown"
+	}
+}
+// vehicle
+type Vehicle struct{
+	Id int
+	vehicleType vehicleType
+}
+
+type vehicleType int
+
+const (
+  Bike vehicleType = iota
+  Car
+  Truck
+)
+
+func GetVehicleType(v vehicleType) string{
+	switch v{
 	case Bike:
 		return "Bike"
 	case Car:
@@ -30,166 +126,52 @@ func (v VehicleType) String() string {
 	}
 }
 
-type SlotSize int
 
-const (
-	Small SlotSize = iota
-	Medium
-	Large
-)
-
-func (s SlotSize) String() string {
-	switch s {
-	case Small:
-		return "Small"
-	case Medium:
-		return "Medium"
-	case Large:
-		return "Large"
-	default:
-		return "Unknown"
-	}
-}
-
-//
-// ===== VEHICLE INTERFACE =====
-//
-
-type Vehicle interface {
-	ID() int
-	Type() VehicleType
-}
-
-type BaseVehicle struct {
-	id          int
-	vehicleType VehicleType
-}
-
-func (v BaseVehicle) ID() int {
-	return v.id
-}
-
-func (v BaseVehicle) Type() VehicleType {
-	return v.vehicleType
-}
-
-//
-// ===== PARKING SLOT =====
-//
-
-type ParkingSlot struct {
-	id       int
-	size     SlotSize
-	occupied bool
-	vehicle  Vehicle
-}
-
-func (s *ParkingSlot) CanFit(v Vehicle) bool {
-	switch s.size {
-	case Small:
-		return v.Type() == Bike
-	case Medium:
-		return v.Type() == Bike || v.Type() == Car
-	case Large:
-		return true
-	default:
-		return false
-	}
-}
-
-//
-// ===== PARKING LOT =====
-//
-
-type ParkingLot struct {
-	id    int
-	slots []ParkingSlot
-}
-
-func NewParkingLot(id int, slots []ParkingSlot) *ParkingLot {
-	return &ParkingLot{
-		id:    id,
-		slots: slots,
-	}
-}
-
-func (p *ParkingLot) Park(v Vehicle) error {
-	for i := range p.slots {
-		slot := &p.slots[i]
-
-		if !slot.occupied && slot.CanFit(v) {
-			slot.occupied = true
-			slot.vehicle = v
-			fmt.Printf("✅ %s parked in slot %d (%s)\n",
-				v.Type(), slot.id, slot.size)
-			return nil
-		}
+func main(){
+	lot := ParkingLot{
+		Id: 1,
+		Slots: []ParkingSlot{
+			{Id: 1, Size: Small},
+			{Id: 2, Size: Small},
+			{Id: 3, Size: Small},
+			{Id: 4, Size: Medium},
+			{Id: 5, Size: Medium},
+			{Id: 6, Size: Medium},
+			{Id: 7, Size: Large},
+			{Id: 8, Size: Large},
+			{Id: 9, Size: Large},
+			{Id: 10, Size: Small},
+		},
 	}
 
-	return errors.New("❌ no available slot")
-}
+	car1 := Vehicle{Id: 1, vehicleType: Car}
+	bike1 := Vehicle{Id: 2, vehicleType: Bike}
+	truck1 := Vehicle{Id: 3, vehicleType: Truck}
 
-func (p *ParkingLot) Unpark(vehicleID int) error {
-	for i := range p.slots {
-		slot := &p.slots[i]
+	car2 := Vehicle{Id: 4, vehicleType: Car}
+	bike2 := Vehicle{Id: 5, vehicleType: Bike}
+	truck2 := Vehicle{Id: 6, vehicleType: Truck}
 
-		if slot.occupied && slot.vehicle.ID() == vehicleID {
-			fmt.Printf("🚗 Vehicle %d left slot %d\n",
-				vehicleID, slot.id)
-			slot.occupied = false
-			slot.vehicle = nil
-			return nil
-		}
-	}
 
-	return errors.New("❌ vehicle not found")
-}
 
-func (p *ParkingLot) AvailableSlots() {
-	count := map[SlotSize]int{
-		Small:  0,
-		Medium: 0,
-		Large:  0,
-	}
+	car3 := Vehicle{Id: 7, vehicleType: Car}
+	bike3 := Vehicle{Id: 8, vehicleType: Bike}
+	truck3 := Vehicle{Id: 9, vehicleType: Truck}
 
-	for _, slot := range p.slots {
-		if !slot.occupied {
-			count[slot.size]++
-		}
-	}
 
-	fmt.Println("\n📊 Available Slots:")
-	for size, c := range count {
-		fmt.Printf("- %s: %d\n", size, c)
-	}
-}
 
-//
-// ===== MAIN =====
-//
 
-func main() {
-	parkingLot := NewParkingLot(1, []ParkingSlot{
-		{id: 1, size: Small},
-		{id: 2, size: Small},
-		{id: 3, size: Medium},
-		{id: 4, size: Medium},
-		{id: 5, size: Large},
-		{id: 6, size: Large},
-	})
+	lot.park(car1)
+	lot.park(bike1)
+	lot.park(truck1)
 
-	car1 := BaseVehicle{id: 1, vehicleType: Car}
-	car2 := BaseVehicle{id: 2, vehicleType: Car}
-	bike1 := BaseVehicle{id: 3, vehicleType: Bike}
-	truck1 := BaseVehicle{id: 4, vehicleType: Truck}
+	lot.park(car2)
+	lot.park(bike2)
+	lot.park(truck2)
 
-	parkingLot.Park(bike1)
-	parkingLot.Park(car1)
-	parkingLot.Park(car2)
-	parkingLot.Park(truck1)
+	lot.park(car3)
+	lot.park(bike3)
+	lot.park(truck3)
 
-	parkingLot.AvailableSlots()
-
-	parkingLot.Unpark(2)
-	parkingLot.AvailableSlots()
+	fmt.Println(lot)
 }
