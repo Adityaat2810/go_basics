@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 /*
 
 1. Basics
@@ -57,3 +59,41 @@ The M pulls a G from that P's queue and runs it.
 */
 
 
+func main(){
+	// Goroutine life-cycle
+	go fmt.Println("hey buddy !")  // Might print nothing
+	fmt.Println("()")
+	// why ?
+	/*
+	* go Put into local run queue
+	* Scheduled by Go scheduler
+	* Runs until:
+	*   - function returns
+	*   - if program exits (panic occur)
+	*/
+
+	// [IMP! When main() exits, all goroutines die immediately.]
+
+}
+
+/********* Blocking and Preemption *****************/
+/*
+  -- Blocking Calls
+	If a goroutine does i/o , sleeps , waits on channel, locks mutex
+	(The scheduler parks it and run another go-routine)
+
+  -- Preemptive scheduling (Go 1.14+)
+        Earlier (Cooperative scheduling)
+		- go switched go-routine at safe points only
+		  (functions call, channel ops, time.Sleep etc )
+		- if goroutine run
+		  for {
+
+		  }  👉 it never stopped
+		 other go-routine can starve
+
+		Nowdays (Preemptive scheduling)
+		- Runtime preempts goroutines
+	    - Even CPU-bound loops won’t block scheduling
+
+*/
