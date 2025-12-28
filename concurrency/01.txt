@@ -1,0 +1,46 @@
+
+1. The Factory Analogy
+    - The Process (The Workshop): A process is like an entire workshop building. It has its own electricity, tools, and raw materials (memory/RAM). Workshops are isolated from each other for safety.
+    - The Thread (The Worker): A thread is like a single worker inside that workshop.
+        1. Multiple workers (threads) can work in the same workshop at the same time.
+        2. They all share the same tools and materials (the process’s memory).
+        3. If one worker makes a mess, it affects the others in that same room.
+
+
+2. OS Threads vs. Goroutines
+
+    OS Threads (traditional model)
+        - Managed by the operating system
+        - Each thread:
+            - Has its own stack (usually 1–8 MB)
+            - Requires kernel involvement for scheduling
+            - Context switches are expensive
+            - Creating thousands of threads:
+                - Heavy memory usage
+                - Slow scheduling
+                - Often hits OS limits
+                - OS threads are powerful, but heavyweight
+
+    Goroutines
+        - Managed by the Go runtime, not the OS
+        - Run on top of OS threads
+        - Extremely lightweight
+        - Scheduled in user space
+        - Millions of goroutines are normal
+
+3. Why Goroutines are "Cheap"
+    - Goroutines are often called "lightweight threads" because they solve three major overhead problems found in OS threads:
+
+    1. Dynamic Stack Size
+        An OS thread is born with a large, fixed-size stack. This is wasteful if your function only needs a few variables, and it limits how many threads you can create before running out of RAM.
+        Goroutines start with only 2KB.
+        If they need more, the Go runtime automatically grows (and shrinks) the stack by allocating more memory on the heap. This allows you to run hundreds of thousands of Goroutines on a standard laptop.
+
+    2. User-Space Scheduling (The M:N Model)
+        OS threads require a "context switch" handled by the CPU kernel to swap from one task to another. This involves saving and restoring registers, which is slow.
+        Go uses an M:N scheduler: It maps M goroutines onto N OS threads.
+        Because the scheduler is part of the Go program (user-space), switching between Goroutines doesn't require "waking up" the kernel. It’s just a few instructions.
+
+    3. Faster Context Switching
+        When an OS thread blocks (e.g., waiting for network input), the CPU must stop and find another thread.
+            - In Go, when a Goroutine blocks, the scheduler simply parks that Goroutine and moves another one onto the existing OS thread. The OS never even knows a switch happened.
